@@ -24,21 +24,21 @@ public class documentService {
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        for (int index = 1; index < 500; index++)
+        for (int index = 1; index < 18781; index++)
             getDocuments(index);
         Thread.sleep(10);
     }
 
     private static void getDocuments(int index) throws IOException {
         String url = "http://qjgwxt.ltkc.net/index.php/Document/DocumentList/status/0/type/all/d_classfy/all/p/" + index + ".html";
-        String cookie = "";
+        String cookie = "PHPSESSID=pnivhokicnnnh53rm5l6jj7102";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cookie", cookie);
         HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
-        ResponseEntity<String> resEntity = restTemplate.exchange(url.toString(), HttpMethod.GET, requestEntity, String.class);
-        Document doc = Jsoup.parse(resEntity.getBody());
-        Elements elements = doc.getElementsByTag("table").get(0).getElementsByTag("tr");
+        ResponseEntity<String> resEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+        Document document = Jsoup.parse(resEntity.getBody());
+        Elements elements = document.getElementsByTag("table").get(0).getElementsByTag("tr");
         for (Element ele : elements) {
             if (ele.getElementsByTag("td").size() == 0) {
                 continue;

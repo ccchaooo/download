@@ -16,7 +16,7 @@ public class Doc {
     String flowDetail = "http://qjgwxt.ltkc.net/index.php/Flow/FlowDetail?did=";
     String documentUrl = "http://qjgwxt.ltkc.net//index.php/Document/Download?did=";
 //    @Value("${admin.cookie}")
-    String cookie = "";
+    String cookie = "PHPSESSID=pnivhokicnnnh53rm5l6jj7102";
 
     public Doc build(Element element) {
         return this;

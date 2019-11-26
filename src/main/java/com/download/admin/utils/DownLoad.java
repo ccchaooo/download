@@ -1,6 +1,8 @@
 package com.download.admin.utils;
 
 import com.download.admin.model.Doc;
+import org.jsoup.Jsoup;
+import org.jsoup.select.Elements;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -12,6 +14,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Objects;
 
 /**
  * @author dengchao
@@ -101,7 +104,7 @@ public class DownLoad {
         body = body.replace("/public/css/style.css", "../../style.css");
 
         // 指定文件名称(有需求可以自定义)
-        String fileFullName = doc.getName()+".html";
+        String fileFullName = doc.getName() + ".html";
         // 指定存放位置(有需求可以自定义)
         String path = doc.getDir() + File.separatorChar + fileFullName;
         File file = new File(path);
@@ -109,20 +112,20 @@ public class DownLoad {
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
-
-        // 校验文件夹目录是否存在，不存在就创建一个目录
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-        byte bytes[] = new byte[512];
-        bytes = body.getBytes();
-        int b = bytes.length; // 是字节的长度，不是字符串的长度
+        byte[] bytes = body.getBytes();
         FileOutputStream fos = new FileOutputStream(file);
-//		fos.write(bytes, 0, b);
         fos.write(bytes);
         fos.flush();
         fos.close();
+        resetName(doc, body);
+        downloadFile(doc);
+    }
 
+    private static void resetName(Doc doc, String body) {
+        Elements a = Jsoup.parse(body).getElementsByTag("a");
+        if (!Objects.isNull(a)) {
+            doc.setName(a.text());
+        }
     }
 
     /**
