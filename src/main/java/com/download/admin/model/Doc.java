@@ -15,8 +15,6 @@ public class Doc {
     LocalDate time;
     String flowDetail = "http://qjgwxt.ltkc.net/index.php/Flow/FlowDetail?did=";
     String documentUrl = "http://qjgwxt.ltkc.net//index.php/Document/Download?did=";
-//    @Value("${admin.cookie}")
-    String cookie = "PHPSESSID=pnivhokicnnnh53rm5l6jj7102";
 
     public Doc build(Element element) {
         return this;
@@ -78,10 +76,6 @@ public class Doc {
         this.flowDetail += id;
     }
 
-    public String getCookie() {
-        return cookie;
-    }
-
     @Override
     public String toString() {
         return "Doc{" +
@@ -91,7 +85,6 @@ public class Doc {
                 ", time=" + time +
                 ", flowDetail='" + flowDetail + '\'' +
                 ", documentUrl='" + documentUrl + '\'' +
-                ", cookie='" + cookie + '\'' +
                 '}';
     }
 }

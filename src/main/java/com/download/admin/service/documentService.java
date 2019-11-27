@@ -2,6 +2,7 @@ package com.download.admin.service;
 
 import com.download.admin.model.Doc;
 import com.download.admin.utils.DownLoad;
+import com.download.admin.utils.cookieUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -29,12 +30,11 @@ public class documentService {
         Thread.sleep(10);
     }
 
-    private static void getDocuments(int index) throws IOException {
+    private static void getDocuments(int index) throws IOException, InterruptedException {
         String url = "http://qjgwxt.ltkc.net/index.php/Document/DocumentList/status/0/type/all/d_classfy/all/p/" + index + ".html";
-        String cookie = "PHPSESSID=pnivhokicnnnh53rm5l6jj7102";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Cookie", cookie);
+        headers.add("Cookie", cookieUtil.cookie);
         HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
         ResponseEntity<String> resEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
         Document document = Jsoup.parse(resEntity.getBody());
@@ -50,7 +50,6 @@ public class documentService {
     }
 
     private static Doc buildDoc(Element title, Element date) {
-//        <a href="/index.php/Flow/FlowDetail?did=19364">邛崃市十八届人大常委会第二十八次常委会通知</a>
         Doc doc = new Doc();
         int begin = title.toString().indexOf("?did") + 5;
         int end = title.toString().indexOf("\">");

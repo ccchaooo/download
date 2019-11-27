@@ -27,9 +27,22 @@ public class DownLoad {
      *
      * @return 返回下载文件
      */
-    public static File downloadFile(Doc doc) {
+    public static void downloadFile(Doc doc) {
         File file = null;
+        // 指定文件名称(有需求可以自定义)
+        String fileFullName = doc.getId() + " " + doc.getName();
         try {
+            // 指定存放位置(有需求可以自定义)
+            String path = doc.getDir() + File.separatorChar + fileFullName;
+            file = new File(path);
+            // 校验文件夹目录是否存在，不存在就创建一个目录
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
+            if (file.exists()) {
+                return;
+            }
+
             // 统一资源
             URL url = new URL(doc.getDocumentUrl());
             // 连接类的父类，抽象类
@@ -40,7 +53,7 @@ public class DownLoad {
             httpURLConnection.setConnectTimeout(1000 * 5);
 
             //设置登录信息
-            httpURLConnection.setRequestProperty("Cookie", doc.getCookie());
+            httpURLConnection.setRequestProperty("Cookie", cookieUtil.cookie);
             //设置请求方式，默认是GET
             httpURLConnection.setRequestMethod("GET");
             // 设置字符编码
@@ -50,21 +63,14 @@ public class DownLoad {
             // 文件大小
             int fileLength = httpURLConnection.getContentLength();
 
-            // 控制台打印文件大小
-            System.out.println("您要下载的文件大小为:" + fileLength / (1024 * 1024) + "MB");
-
             // 建立链接从请求中获取数据
             URLConnection con = url.openConnection();
             BufferedInputStream bin = new BufferedInputStream(httpURLConnection.getInputStream());
-            // 指定文件名称(有需求可以自定义)
-            String fileFullName = doc.getName();
-            // 指定存放位置(有需求可以自定义)
-            String path = doc.getDir() + File.separatorChar + fileFullName;
-            file = new File(path);
-            // 校验文件夹目录是否存在，不存在就创建一个目录
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
+
+
+            // 控制台打印文件大小
+            System.out.println(fileFullName + " 大小为:" + fileLength / (1024) + "kb");
+
 
             OutputStream out = new FileOutputStream(file);
             int size = 0;
@@ -73,38 +79,20 @@ public class DownLoad {
             while ((size = bin.read(buf)) != -1) {
                 len += size;
                 out.write(buf, 0, size);
-                // 控制台打印文件下载的百分比情况
-                System.out.println("下载了-------> " + len * 100 / fileLength + "%\n");
             }
             // 关闭资源
             bin.close();
             out.close();
-            System.out.println("文件下载成功！");
-        } catch (MalformedURLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            System.out.println("文件下载失败！");
-        } finally {
-            return file;
+        } catch (Exception e) {
+            System.out.println("文件下载失败:" + fileFullName);
         }
-
     }
 
 
-    public static void downloadHtml(Doc doc) throws IOException {
-        HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.add("Cookie", doc.getCookie());
-        RestTemplate template = new RestTemplate();
-        HttpEntity<String> requestEntity = new HttpEntity<>(null, requestHeaders);
-        ResponseEntity<String> response = template.exchange(doc.getFlowDetail(), HttpMethod.GET, requestEntity, String.class);
-        String body = response.getBody();
-        body = body.replace("/public/css/style.css", "../../style.css");
-
+    public static void downloadHtml(Doc doc) {
         // 指定文件名称(有需求可以自定义)
-        String fileFullName = doc.getName() + ".html";
+        String fileFullName = doc.getId() + " " + doc.getName() + ".html";
+
         // 指定存放位置(有需求可以自定义)
         String path = doc.getDir() + File.separatorChar + fileFullName;
         File file = new File(path);
@@ -112,11 +100,26 @@ public class DownLoad {
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
+
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("Cookie", cookieUtil.cookie);
+        RestTemplate template = new RestTemplate();
+        HttpEntity<String> requestEntity = new HttpEntity<>(null, requestHeaders);
+        ResponseEntity<String> response = template.exchange(doc.getFlowDetail(), HttpMethod.GET, requestEntity, String.class);
+        String body = response.getBody();
+        body = body.replace("/public/css/style.css", "../../style.css");
+
+        // 控制台打印文件大小
+        System.out.println(fileFullName + " 大小为:" + body.length() / (1024) + "kb");
+
         byte[] bytes = body.getBytes();
-        FileOutputStream fos = new FileOutputStream(file);
-        fos.write(bytes);
-        fos.flush();
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(bytes);
+            fos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("文件下载失败:" + fileFullName);
+        }
         resetName(doc, body);
         downloadFile(doc);
     }
@@ -128,15 +131,4 @@ public class DownLoad {
         }
     }
 
-    /**
-     * 测试
-     *
-     * @param args
-     */
-    public static void main(String[] args) {
-        // 指定资源地址，下载文件测试
-//        downloadFile("http://qjgwxt.ltkc.net/index.php/Document/Download?did=19364", "D:/myFiles/");
-//        downloadHtml("http://qjgwxt.ltkc.net/index.php/Flow/FlowDetail?did=19364", "D:/myFiles/");
-
-    }
 }
