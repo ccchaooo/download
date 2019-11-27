@@ -60,6 +60,7 @@ public class documentService {
         doc.setDir("D:/DocDownload/" + time.getYear() + "/" + time.getMonth() + "/");
         doc.setDocumentUrl(doc.getId());
         doc.setFlowDetail(doc.getId());
+        System.out.println(doc.getId() + ": " + doc.getName());
         return doc;
     }
 

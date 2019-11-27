@@ -69,7 +69,7 @@ public class DownLoad {
 
 
             // 控制台打印文件大小
-            System.out.println(fileFullName + " 大小为:" + fileLength / (1024) + "kb");
+//            System.out.println(fileFullName + " 大小为:" + fileLength / (1024) + "kb");
 
 
             OutputStream out = new FileOutputStream(file);
@@ -100,7 +100,9 @@ public class DownLoad {
         if (!file.getParentFile().exists()) {
             file.getParentFile().mkdirs();
         }
-
+        if (file.exists()) {
+            return;
+        }
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.add("Cookie", cookieUtil.cookie);
         RestTemplate template = new RestTemplate();
@@ -110,7 +112,7 @@ public class DownLoad {
         body = body.replace("/public/css/style.css", "../../style.css");
 
         // 控制台打印文件大小
-        System.out.println(fileFullName + " 大小为:" + body.length() / (1024) + "kb");
+//        System.out.println(fileFullName + " 大小为:" + body.length() / (1024) + "kb");
 
         byte[] bytes = body.getBytes();
         try (FileOutputStream fos = new FileOutputStream(file)) {
