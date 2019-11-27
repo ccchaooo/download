@@ -39,25 +39,25 @@ public class documentService {
         ResponseEntity<String> resEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
         Document document = Jsoup.parse(resEntity.getBody());
         Elements elements = document.getElementsByTag("table").get(0).getElementsByTag("tr");
-        for (Element ele : elements) {
-            if (ele.getElementsByTag("td").size() == 0) {
-                continue;
-            }
-            Element title = ele.getElementsByTag("td").get(7).getElementsByTag("a").get(0);
-            Element date = ele.getElementsByTag("td").get(13).getElementsByTag("td").get(0);
-            DownLoad.downloadHtml(buildDoc(title, date));
-        }
+        elements.parallelStream()
+                .filter(ele -> ele.getElementsByTag("td").size() > 0)
+                .map(documentService::buildDoc)
+                .forEach(DownLoad::downloadHtml);
     }
 
-    private static Doc buildDoc(Element title, Element date) {
+    private static Doc buildDoc(Element ele) {
+
+        Element title = ele.getElementsByTag("td").get(7).getElementsByTag("a").get(0);
+        Element date = ele.getElementsByTag("td").get(13).getElementsByTag("td").get(0);
+
         Doc doc = new Doc();
         int begin = title.toString().indexOf("?did") + 5;
         int end = title.toString().indexOf("\">");
-        doc.setId(Integer.parseInt(title.toString().substring(begin,end)));
+        doc.setId(Integer.parseInt(title.toString().substring(begin, end)));
         LocalDate time = LocalDate.parse(date.text());
         doc.setTime(time);
         doc.setName(title.text());
-        doc.setDir("D:/DocDownload/"+time.getYear()+"/"+time.getMonth()+"/");
+        doc.setDir("D:/DocDownload/" + time.getYear() + "/" + time.getMonth() + "/");
         doc.setDocumentUrl(doc.getId());
         doc.setFlowDetail(doc.getId());
         return doc;
