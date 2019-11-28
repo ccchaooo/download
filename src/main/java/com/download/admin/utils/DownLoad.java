@@ -30,7 +30,7 @@ public class DownLoad {
     public static void downloadFile(Doc doc) {
         File file = null;
         // 指定文件名称(有需求可以自定义)
-        String fileFullName = doc.getId() + " " + doc.getName();
+        String fileFullName = doc.getId() + " ";// + doc.getName();
         try {
             // 指定存放位置(有需求可以自定义)
             String path = doc.getDir() + File.separatorChar + fileFullName;
@@ -129,7 +129,7 @@ public class DownLoad {
     private static void resetName(Doc doc, String body) {
         Elements a = Jsoup.parse(body).getElementsByTag("a");
         if (!Objects.isNull(a)) {
-            doc.setName(a.text());
+            //doc.setName(a.text());
         }
     }
 

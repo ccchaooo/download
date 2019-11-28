@@ -10,22 +10,31 @@ import java.time.LocalDate;
  */
 public class Doc {
     Integer id;
-    String name;
+    String htmlName;
+    String docName;
     String dir;
     LocalDate time;
     String flowDetail = "http://qjgwxt.ltkc.net/index.php/Flow/FlowDetail?did=";
     String documentUrl = "http://qjgwxt.ltkc.net//index.php/Document/Download?did=";
 
+    public String getHtmlName() {
+        return htmlName;
+    }
+
+    public void setHtmlName(String htmlName) {
+        this.htmlName = htmlName;
+    }
+
+    public String getDocName() {
+        return docName;
+    }
+
+    public void setDocName(String docName) {
+        this.docName = docName;
+    }
+
     public Doc build(Element element) {
         return this;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Integer getId() {
@@ -80,7 +89,6 @@ public class Doc {
     public String toString() {
         return "Doc{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
                 ", dir='" + dir + '\'' +
                 ", time=" + time +
                 ", flowDetail='" + flowDetail + '\'' +
