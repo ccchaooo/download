@@ -2,6 +2,7 @@ package com.download.admin.service;
 
 import com.download.admin.model.Doc;
 import com.download.admin.utils.DownLoad;
+import com.download.admin.utils.FileUtil;
 import com.download.admin.utils.cookieUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Map;
 
 
 /**
@@ -23,6 +25,7 @@ import java.time.LocalDate;
  */
 public class documentService {
 
+    private static Map<String,String> savedFiles = FileUtil.getFiles();
 
     public static void main(String[] args) throws IOException, InterruptedException {
         for (int index = 1; index < 18781; index++)
@@ -42,6 +45,7 @@ public class documentService {
         elements.parallelStream()
                 .filter(ele -> ele.getElementsByTag("td").size() > 0)
                 .map(documentService::buildDoc)
+                .filter(doc -> savedFiles.containsKey(doc.getName()))
                 .forEach(DownLoad::downloadHtml);
     }
 
