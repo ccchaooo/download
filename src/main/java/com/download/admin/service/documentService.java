@@ -14,6 +14,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
@@ -25,28 +27,49 @@ import java.util.Map;
  */
 public class documentService {
 
-    private static Map<String,String> savedFiles = FileUtil.getFiles();
+    private static Map<String, String> savedFiles = FileUtil.getFiles();
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        for (int index = 1; index < 18781; index++)
+        for (int index = 19416; index > 1; index--
+        )
             getDocuments(index);
         Thread.sleep(10);
     }
 
     private static void getDocuments(int index) throws IOException, InterruptedException {
-        String url = "http://qjgwxt.ltkc.net/index.php/Document/DocumentList/status/0/type/all/d_classfy/all/p/" + index + ".html";
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Cookie", cookieUtil.cookie);
-        HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
-        ResponseEntity<String> resEntity = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-        Document document = Jsoup.parse(resEntity.getBody());
-        Elements elements = document.getElementsByTag("table").get(0).getElementsByTag("tr");
-        elements.parallelStream()
-                .filter(ele -> ele.getElementsByTag("td").size() > 0)
-                .map(documentService::buildDoc)
-                .filter(doc -> savedFiles.containsKey(doc.getName()))
-                .forEach(DownLoad::downloadHtml);
+        String flowDetail = "http://qjgwxt.ltkc.net/index.php/Flow/FlowDetail?did=" + index;
+
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.add("Cookie", cookieUtil.cookie);
+        RestTemplate template = new RestTemplate();
+        HttpEntity<String> requestEntity = new HttpEntity<>(null, requestHeaders);
+        ResponseEntity<String> response = template.exchange(flowDetail, HttpMethod.GET, requestEntity, String.class);
+        String body = response.getBody();
+        body = body.replace("/public/css/style.css", "../../style.css");
+
+
+        // 指定文件名称(有需求可以自定义)
+        String fileFullName = index + ".html";
+
+        // 指定存放位置(有需求可以自定义)
+        String path = File.separatorChar + fileFullName;
+        File file = new File(path);
+        // 校验文件夹目录是否存在，不存在就创建一个目录
+        if (!file.getParentFile().exists()) {
+            file.getParentFile().mkdirs();
+        }
+
+        byte[] bytes = body.getBytes();
+        try (FileOutputStream fos = new FileOutputStream(file)) {
+            fos.write(bytes);
+            fos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("文件下载失败:" + fileFullName);
+        }
+//        resetName(doc, body);
+//        downloadFile(doc);
+
     }
 
     private static Doc buildDoc(Element ele) {

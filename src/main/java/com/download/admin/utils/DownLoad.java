@@ -90,40 +90,40 @@ public class DownLoad {
 
 
     public static void downloadHtml(Doc doc) {
-        // 指定文件名称(有需求可以自定义)
-        String fileFullName = doc.getId() + " " + doc.getName() + ".html";
-
-        // 指定存放位置(有需求可以自定义)
-        String path = doc.getDir() + File.separatorChar + fileFullName;
-        File file = new File(path);
-        // 校验文件夹目录是否存在，不存在就创建一个目录
-        if (!file.getParentFile().exists()) {
-            file.getParentFile().mkdirs();
-        }
-        if (file.exists()) {
-            return;
-        }
-        HttpHeaders requestHeaders = new HttpHeaders();
-        requestHeaders.add("Cookie", cookieUtil.cookie);
-        RestTemplate template = new RestTemplate();
-        HttpEntity<String> requestEntity = new HttpEntity<>(null, requestHeaders);
-        ResponseEntity<String> response = template.exchange(doc.getFlowDetail(), HttpMethod.GET, requestEntity, String.class);
-        String body = response.getBody();
-        body = body.replace("/public/css/style.css", "../../style.css");
-
-        // 控制台打印文件大小
-//        System.out.println(fileFullName + " 大小为:" + body.length() / (1024) + "kb");
-
-        byte[] bytes = body.getBytes();
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(bytes);
-            fos.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println("文件下载失败:" + fileFullName);
-        }
-        resetName(doc, body);
-        downloadFile(doc);
+//        // 指定文件名称(有需求可以自定义)
+//        String fileFullName = doc.getId() + " " + doc.getName() + ".html";
+//
+//        // 指定存放位置(有需求可以自定义)
+//        String path = doc.getDir() + File.separatorChar + fileFullName;
+//        File file = new File(path);
+//        // 校验文件夹目录是否存在，不存在就创建一个目录
+//        if (!file.getParentFile().exists()) {
+//            file.getParentFile().mkdirs();
+//        }
+//        if (file.exists()) {
+//            return;
+//        }
+//        HttpHeaders requestHeaders = new HttpHeaders();
+//        requestHeaders.add("Cookie", cookieUtil.cookie);
+//        RestTemplate template = new RestTemplate();
+//        HttpEntity<String> requestEntity = new HttpEntity<>(null, requestHeaders);
+//        ResponseEntity<String> response = template.exchange(doc.getFlowDetail(), HttpMethod.GET, requestEntity, String.class);
+//        String body = response.getBody();
+//        body = body.replace("/public/css/style.css", "../../style.css");
+//
+//        // 控制台打印文件大小
+////        System.out.println(fileFullName + " 大小为:" + body.length() / (1024) + "kb");
+//
+//        byte[] bytes = body.getBytes();
+//        try (FileOutputStream fos = new FileOutputStream(file)) {
+//            fos.write(bytes);
+//            fos.flush();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            System.out.println("文件下载失败:" + fileFullName);
+//        }
+//        resetName(doc, body);
+//        downloadFile(doc);
     }
 
     private static void resetName(Doc doc, String body) {
