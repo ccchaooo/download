@@ -4,11 +4,9 @@ import com.download.admin.model.Doc;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Objects;
@@ -26,22 +24,9 @@ public class DownLoad {
      */
     public static void downloadFile(Doc doc) {
         File file = null;
-        // 指定文件名称(有需求可以自定义)
-        String fileFullName = doc.getId() + " ";// + doc.getName();
         try {
-            // 指定存放位置(有需求可以自定义)
-            String path = doc.getDocumentUrl() + File.separatorChar + fileFullName;
-            file = new File(path);
-            // 校验文件夹目录是否存在，不存在就创建一个目录
-            if (!file.getParentFile().exists()) {
-                file.getParentFile().mkdirs();
-            }
-            if (file.exists()) {
-                return;
-            }
-
             // 统一资源
-            URL url = new URL(doc.getDocumentUrl());
+            URL url = new URL(doc.getDocumentUrl()+doc.getId());
             // 连接类的父类，抽象类
             URLConnection urlConnection = url.openConnection();
             // http的连接类
@@ -60,14 +45,21 @@ public class DownLoad {
             // 文件大小
             int fileLength = httpURLConnection.getContentLength();
 
+            // 控制台打印文件大小
+            System.out.println("您要下载的文件大小为:" + fileLength / (1024 * 1024) + "MB");
+
             // 建立链接从请求中获取数据
             URLConnection con = url.openConnection();
             BufferedInputStream bin = new BufferedInputStream(httpURLConnection.getInputStream());
-
-
-            // 控制台打印文件大小
-//            System.out.println(fileFullName + " 大小为:" + fileLength / (1024) + "kb");
-
+            // 指定文件名称(有需求可以自定义)
+            String fileFullName = doc.getDocName();
+            // 指定存放位置(有需求可以自定义)
+            String path = doc.getDir() + File.separatorChar + fileFullName;
+            file = new File(path);
+            // 校验文件夹目录是否存在，不存在就创建一个目录
+            if (!file.getParentFile().exists()) {
+                file.getParentFile().mkdirs();
+            }
 
             OutputStream out = new FileOutputStream(file);
             int size = 0;
@@ -76,12 +68,20 @@ public class DownLoad {
             while ((size = bin.read(buf)) != -1) {
                 len += size;
                 out.write(buf, 0, size);
+                // 控制台打印文件下载的百分比情况
+//                System.out.println("下载了-------> " + len * 100 / fileLength + "%\n");
             }
             // 关闭资源
             bin.close();
             out.close();
-        } catch (Exception e) {
-            System.out.println("文件下载失败:" + fileFullName);
+            System.out.println("文件下载成功！");
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            System.out.println("文件下载失败！");
         }
     }
 

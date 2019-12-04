@@ -38,7 +38,7 @@ public class documentService {
         }
     }
 
-    private static void getDocuments(int index) {
+    public static void getDocuments(int index) {
         String flowDetail = "http://qjgwxt.ltkc.net/index.php/Flow/FlowDetail?did=" + index;
 
         HttpHeaders requestHeaders = new HttpHeaders();
@@ -66,13 +66,12 @@ public class documentService {
         try (FileOutputStream fos = new FileOutputStream(file)) {
             fos.write(bytes);
             fos.flush();
+
+            DownLoad.downloadFile(doc);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("文件下载失败:" + doc.getHtmlName());
+            System.out.println("页面下载失败:" + doc.getHtmlName());
         }
-
-        DownLoad.downloadFile(doc);
-
     }
 
     private static Doc buildDoc(int index, String body) {
