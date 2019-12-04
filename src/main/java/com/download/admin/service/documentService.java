@@ -5,8 +5,6 @@ import com.download.admin.utils.DownLoad;
 import com.download.admin.utils.FileUtil;
 import com.download.admin.utils.cookieUtil;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -16,9 +14,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Objects;
 
 
 /**
@@ -29,14 +27,18 @@ public class documentService {
 
     private static Map<String, String> savedFiles = FileUtil.getFiles();
 
-    public static void main(String[] args) throws IOException, InterruptedException {
-        for (int index = 19416; index > 1; index--
-        )
+    public static void main(String[] args) {
+        for (int index = 19472; index > 1; index--) {
+            if (savedFiles.containsKey(String.valueOf(index))) {
+                System.out.println("已存在:" + savedFiles.get(String.valueOf(index)));
+                continue;
+            }
             getDocuments(index);
-        Thread.sleep(10);
+//            Thread.sleep(10);
+        }
     }
 
-    private static void getDocuments(int index) throws IOException, InterruptedException {
+    private static void getDocuments(int index) {
         String flowDetail = "http://qjgwxt.ltkc.net/index.php/Flow/FlowDetail?did=" + index;
 
         HttpHeaders requestHeaders = new HttpHeaders();
@@ -48,9 +50,12 @@ public class documentService {
         body = body.replace("/public/css/style.css", "../../style.css");
 
         Doc doc = buildDoc(index, body);
+        if (Objects.isNull(doc)) {
+            return;
+        }
 
         // 指定存放位置(有需求可以自定义)
-        String path = File.separatorChar + doc.getHtmlName();
+        String path = doc.getDir() + File.separatorChar + doc.getHtmlName();
         File file = new File(path);
         // 校验文件夹目录是否存在，不存在就创建一个目录
         if (!file.getParentFile().exists()) {
@@ -65,15 +70,21 @@ public class documentService {
             e.printStackTrace();
             System.out.println("文件下载失败:" + doc.getHtmlName());
         }
-//        resetName(doc, body);
-//        downloadFile(doc);
+
+        DownLoad.downloadFile(doc);
 
     }
 
     private static Doc buildDoc(int index, String body) {
         Elements tds = Jsoup.parse(body).getElementsByTag("td");
         Doc doc = new Doc();
-        LocalDate time = LocalDate.parse(tds.get(9).text());
+        LocalDate time;
+        try {
+            time = LocalDate.parse(tds.get(9).text());
+        } catch (Exception e) {
+            return new Doc();
+        }
+        doc.setId(index);
         doc.setTime(time);
         doc.setHtmlName(index + " " + tds.get(13).text() + ".html");
         doc.setDocName(index + " " + tds.get(15).text());
@@ -81,25 +92,4 @@ public class documentService {
         System.out.println(doc.getId() + ": " + doc.getDocName());
         return doc;
     }
-
-//    private static Doc buildDoc(Element ele) {
-//
-//        Element title = ele.getElementsByTag("td").get(7).getElementsByTag("a").get(0);
-//        Element date = ele.getElementsByTag("td").get(13).getElementsByTag("td").get(0);
-//
-//        Doc doc = new Doc();
-//        int begin = title.toString().indexOf("?did") + 5;
-//        int end = title.toString().indexOf("\">");
-//        doc.setId(Integer.parseInt(title.toString().substring(begin, end)));
-//        LocalDate time = LocalDate.parse(date.text());
-//        doc.setTime(time);
-//        doc.setName(title.text());
-//        doc.setDir("D:/DocDownload/" + time.getYear() + "/" + time.getMonth() + "/");
-//        doc.setDocumentUrl(doc.getId());
-//        doc.setFlowDetail(doc.getId());
-//        System.out.println(doc.getId() + ": " + doc.getName());
-//        return doc;
-//    }
-
-
 }

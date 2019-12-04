@@ -3,15 +3,12 @@ package com.download.admin.utils;
 import com.download.admin.model.Doc;
 import org.jsoup.Jsoup;
 import org.jsoup.select.Elements;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Objects;
@@ -33,7 +30,7 @@ public class DownLoad {
         String fileFullName = doc.getId() + " ";// + doc.getName();
         try {
             // 指定存放位置(有需求可以自定义)
-            String path = doc.getDir() + File.separatorChar + fileFullName;
+            String path = doc.getDocumentUrl() + File.separatorChar + fileFullName;
             file = new File(path);
             // 校验文件夹目录是否存在，不存在就创建一个目录
             if (!file.getParentFile().exists()) {

@@ -1,7 +1,6 @@
 package com.download.admin.utils;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +13,7 @@ public class FileUtil {
     private static Map<String, String> files = new HashMap<>();
 
     public static Map<String, String> getFiles() {
-        if (files.size() ==0){
+        if (files.size() !=0){
             return files;
         }
         String path = "D:/DocDownload/";
