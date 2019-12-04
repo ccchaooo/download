@@ -18,7 +18,7 @@ public class ThreadPool {
         //maximumPoolSize设置为2 ，拒绝策略为AbortPolic策略，直接抛出异常
         pool = new ThreadPoolExecutor(1,
                 2,
-                5000,
+                1000,
                 TimeUnit.MILLISECONDS,
                 new SynchronousQueue<Runnable>(),
                 Executors.defaultThreadFactory(),
@@ -28,8 +28,8 @@ public class ThreadPool {
                 System.out.println("已存在:" + savedFiles.get(String.valueOf(index)));
                 continue;
             }
-            Thread.sleep(50);
-            pool.execute(new ThreadTask(index));
+            Thread.sleep(200);
+            new ThreadTask(index).run();
         }
     }
 }
