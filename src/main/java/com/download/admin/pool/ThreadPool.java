@@ -23,12 +23,12 @@ public class ThreadPool {
                 new SynchronousQueue<Runnable>(),
                 Executors.defaultThreadFactory(),
                 new ThreadPoolExecutor.AbortPolicy());
-        for (int index = 19472; index > 1; index--) {
+        for (int index = 18933; index > 1; index--) {
             if (savedFiles.containsKey(String.valueOf(index))) {
                 System.out.println("已存在:" + savedFiles.get(String.valueOf(index)));
                 continue;
             }
-            Thread.sleep(200);
+            Thread.sleep(20);
             new ThreadTask(index).run();
         }
     }

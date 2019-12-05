@@ -46,7 +46,7 @@ public class DownLoad {
             int fileLength = httpURLConnection.getContentLength();
 
             // 控制台打印文件大小
-            System.out.println("您要下载的文件大小为:" + fileLength / (1024 * 1024) + "MB");
+            System.out.println("您要下载的文件大小为:" + fileLength / (1024) + "KB");
 
             // 建立链接从请求中获取数据
             URLConnection con = url.openConnection();
