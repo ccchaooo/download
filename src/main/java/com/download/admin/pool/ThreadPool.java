@@ -2,6 +2,7 @@ package com.download.admin.pool;
 
 import com.download.admin.utils.FileUtil;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.*;
 
@@ -23,7 +24,13 @@ public class ThreadPool {
                 new SynchronousQueue<Runnable>(),
                 Executors.defaultThreadFactory(),
                 new ThreadPoolExecutor.AbortPolicy());
-        for (int index = 18933; index > 1; index--) {
+        Integer head = savedFiles
+                .keySet()
+                .stream()
+                .filter(index->index.startsWith("1"))
+                .map(Integer::parseInt).min(Comparator.comparingInt(a -> a))
+                .get();
+        for (int index = head; index > 1; index--) {
             if (savedFiles.containsKey(String.valueOf(index))) {
                 System.out.println("已存在:" + savedFiles.get(String.valueOf(index)));
                 continue;
